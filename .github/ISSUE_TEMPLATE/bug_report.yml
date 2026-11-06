@@ -1,0 +1,61 @@
+name: 🐛 Bug report
+description: Something is not blurred, or the extension is not working as expected.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please **do not** include screenshots that show real names, messages or photos.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the problem. What did you expect to be blurred, and what actually happened?
+      placeholder: "Example: Group participant names in the chat header are no longer blurred."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Turn on "Contact names"
+        2. Open a group chat
+        3. Look at the header
+    validations:
+      required: true
+  - type: dropdown
+    id: setting
+    attributes:
+      label: Which setting is affected?
+      multiple: true
+      options:
+        - Blur everything
+        - Contact names
+        - Conversation text
+        - Photos & videos
+        - Popup / settings interface
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Extension version
+      description: Shown on the card in chrome://extensions
+      placeholder: "2.0.0"
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: "Chrome 142 on Windows 11"
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Console errors, privacy-safe screenshots, or other context.

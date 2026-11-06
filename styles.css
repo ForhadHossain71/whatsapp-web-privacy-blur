@@ -1,0 +1,13 @@
+.blur-item {
+    filter: blur(12px) !important;
+    transition: filter 0.3s ease;
+}
+
+.blur-media {
+    filter: blur(30px) brightness(0.5) !important;
+    transition: filter 0.3s ease;
+}
+
+.blur-item:hover, .blur-media:hover {
+    filter: blur(0px) brightness(1) !important;
+}

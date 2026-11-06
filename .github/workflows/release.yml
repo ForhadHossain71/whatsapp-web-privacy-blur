@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check manifest version matches tag
+        run: |
+          MANIFEST_VERSION=$(jq -r .version manifest.json)
+          if [ "v$MANIFEST_VERSION" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match manifest version $MANIFEST_VERSION"
+            exit 1
+          fi
+
+      - name: Package extension
+        run: |
+          ZIP="wa-privacy-pro-${GITHUB_REF_NAME}.zip"
+          zip -r "$ZIP" manifest.json *.html *.js *.css icons LICENSE
+          echo "ZIP=$ZIP" >> "$GITHUB_ENV"
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ZIP }}
+          generate_release_notes: true
+          body: |
+            ## Install
+            1. Download **${{ env.ZIP }}** below and unzip it.
+            2. Open `chrome://extensions` and turn on **Developer mode**.
+            3. Click **Load unpacked** and select the unzipped folder.
+
+            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.

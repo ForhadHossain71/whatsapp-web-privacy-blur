@@ -1,0 +1,30 @@
+name: 💡 Feature request
+description: Suggest an idea to make WA Privacy Pro better.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      placeholder: "Example: I often forget to turn blur on before sharing my screen."
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Your idea
+      placeholder: "Example: Automatically blur everything when screen sharing starts."
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: This idea does not require collecting or sending any user data.
+          required: true

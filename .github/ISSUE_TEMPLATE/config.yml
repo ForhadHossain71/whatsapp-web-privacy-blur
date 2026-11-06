@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Ask a question on Telegram
+    url: https://t.me/forhad71
+    about: Quick questions and help with installation.
+  - name: 🔐 Report a security issue privately
+    url: https://github.com/ForhadHossain71/whatsapp-web-privacy-blur/security/advisories/new
+    about: Please do not report security problems in public issues.

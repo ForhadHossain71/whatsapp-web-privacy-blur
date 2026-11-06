@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "WA Privacy Pro",
+  "short_name": "WA Privacy",
+  "version": "2.0.0",
+  "description": "Blur contact names, messages and media on WhatsApp Web. Hover to peek. Keep your chats private from shoulder surfers.",
+  "author": "Forhad Hossain",
+  "homepage_url": "https://t.me/forhad71",
+  "permissions": ["storage"],
+  "host_permissions": ["https://web.whatsapp.com/*"],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "WA Privacy Pro",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://web.whatsapp.com/*"],
+      "js": ["content.js"],
+      "css": ["styles.css"]
+    }
+  ]
+}

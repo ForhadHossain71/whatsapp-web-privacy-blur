@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="ui.css">
+    <style>
+        body { width: 300px; overflow: hidden; }
+        .wrap { padding: 16px; }
+
+        .view { display: none; }
+        .view.active { display: block; animation: enter 0.28s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        @keyframes enter {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: none; }
+        }
+
+        .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .actions { display: flex; gap: 6px; }
+        #openSettings:hover svg { transform: rotate(60deg); }
+        #openSettings svg { transition: transform 0.3s ease; }
+
+        /* Hero */
+        .hero { padding: 22px 18px 18px; text-align: center; }
+        .orb {
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 14px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            position: relative;
+            color: var(--muted);
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            transition: all 0.35s ease;
+        }
+        .orb svg { width: 32px; height: 32px; }
+        .orb .check { opacity: 0; transition: opacity 0.3s ease; }
+        .orb::after {
+            content: "";
+            position: absolute;
+            inset: -7px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            opacity: 0;
+        }
+        .hero[data-state="on"] .orb {
+            color: #fff;
+            border-color: transparent;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            box-shadow: 0 14px 30px -10px var(--glow);
+        }
+        .hero[data-state="on"] .orb .check { opacity: 1; }
+        .hero[data-state="on"] .orb::after { animation: pulse 2.4s ease-out infinite; }
+        .hero[data-state="partial"] .orb { color: var(--warn); background: var(--warn-soft); border-color: transparent; }
+        @keyframes pulse {
+            0% { opacity: 0.5; transform: scale(0.92); }
+            100% { opacity: 0; transform: scale(1.18); }
+        }
+
+        .status-title { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+        .status-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+        .main-btn {
+            width: 100%;
+            margin-top: 16px;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            box-shadow: 0 8px 20px -8px var(--glow);
+            transition: all 0.25s ease;
+        }
+        .main-btn:hover { filter: brightness(1.06); box-shadow: 0 10px 24px -8px var(--glow); }
+        .main-btn:active { transform: scale(0.98); }
+        .main-btn svg { width: 16px; height: 16px; }
+        body.is-on .main-btn {
+            color: var(--danger);
+            background: var(--danger-soft);
+            box-shadow: none;
+        }
+
+        /* Chips */
+        .chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+        .chip {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 4px 9px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-2);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+        .chip:hover { border-color: var(--c); }
+        .chip:disabled { cursor: default; }
+        .chip:disabled:hover { border-color: var(--border); }
+        .chip-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            background: var(--surface-2);
+            transition: all 0.2s ease;
+        }
+        .chip-icon svg { width: 15px; height: 15px; }
+        .chip.active .chip-icon { color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); }
+        .chip.active { color: var(--text); }
+        .chip-state { font-size: 9px; font-weight: 700; letter-spacing: 0.5px; color: var(--muted); text-transform: uppercase; }
+        .chip.active .chip-state { color: var(--c); }
+
+        /* Settings */
+        .settings-head { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .settings-title { font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
+        .settings-sub { font-size: 11px; color: var(--muted); }
+        .group { margin-bottom: 14px; }
+
+        .footer { margin-top: 14px; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+
+        <div id="mainView" class="view active">
+            <div class="topbar">
+                <div class="brand">
+                    <div class="logo">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <div>
+                        <div class="brand-name">WA Privacy<span class="badge">PRO</span></div>
+                        <div class="brand-sub">WhatsApp Web shield</div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="icon-btn themeToggle" title="Toggle theme" aria-label="Toggle theme">
+                        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                    </button>
+                    <button id="openSettings" class="icon-btn" title="Settings" aria-label="Settings">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card hero" id="hero" data-state="off">
+                <div class="orb">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <polyline class="check" points="8.5 12 11 14.5 15.5 10"/>
+                    </svg>
+                </div>
+                <div class="status-title" id="statusTitle">Protection off</div>
+                <div class="status-sub" id="statusSub">Your chats are visible</div>
+                <button id="masterToggle" class="main-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <span id="btnText">Enable Blur</span>
+                </button>
+            </div>
+
+            <div class="chips">
+                <button class="chip" id="chip-blurNames" style="--c:#0891b2">
+                    <span class="chip-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+                    Names
+                    <span class="chip-state">Off</span>
+                </button>
+                <button class="chip" id="chip-blurMessages" style="--c:#7c3aed">
+                    <span class="chip-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                    Messages
+                    <span class="chip-state">Off</span>
+                </button>
+                <button class="chip" id="chip-blurMedia" style="--c:#d97706">
+                    <span class="chip-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+                    Media
+                    <span class="chip-state">Off</span>
+                </button>
+            </div>
+
+            <div class="credit footer">
+                Made by
+                <a href="https://t.me/forhad71" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+                    @forhad71
+                </a>
+            </div>
+        </div>
+
+        <div id="settingsView" class="view">
+            <div class="settings-head">
+                <button id="backBtn" class="icon-btn" title="Back" aria-label="Back">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+                </button>
+                <div>
+                    <div class="settings-title">Settings</div>
+                    <div class="settings-sub">Choose what gets blurred</div>
+                </div>
+            </div>
+
+            <div class="group">
+                <div class="section-label">Master control</div>
+                <div class="card">
+                    <div class="row">
+                        <div class="row-info">
+                            <div class="row-icon" style="--c:#4f46e5">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            </div>
+                            <div>
+                                <div class="row-label">Blur everything</div>
+                                <div class="row-desc">Overrides the options below</div>
+                            </div>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="allBlur"><span class="slider"></span></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="group">
+                <div class="section-label">Fine-tuning</div>
+                <div class="hint">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                    Everything is blurred while master is on
+                </div>
+                <div class="card">
+                    <div class="row" id="row-blurNames">
+                        <div class="row-info">
+                            <div class="row-icon" style="--c:#0891b2">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </div>
+                            <div>
+                                <div class="row-label">Contact names</div>
+                                <div class="row-desc">Chat list and headers</div>
+                            </div>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="blurNames"><span class="slider"></span></label>
+                    </div>
+                    <div class="row" id="row-blurMessages">
+                        <div class="row-info">
+                            <div class="row-icon" style="--c:#7c3aed">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            </div>
+                            <div>
+                                <div class="row-label">Conversation text</div>
+                                <div class="row-desc">Messages and previews</div>
+                            </div>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="blurMessages"><span class="slider"></span></label>
+                    </div>
+                    <div class="row" id="row-blurMedia">
+                        <div class="row-info">
+                            <div class="row-icon" style="--c:#d97706">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </div>
+                            <div>
+                                <div class="row-label">Photos &amp; videos</div>
+                                <div class="row-desc">Avatars, images, stickers</div>
+                            </div>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="blurMedia"><span class="slider"></span></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="credit footer">
+                Made by
+                <a href="https://t.me/forhad71" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+                    @forhad71
+                </a>
+            </div>
+        </div>
+
+    </div>
+    <script src="theme.js"></script>
+    <script src="popup.js"></script>
+</body>
+</html>
